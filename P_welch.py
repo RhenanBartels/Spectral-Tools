@@ -15,6 +15,7 @@ import numpy as np
 
 def pwelch(data, D, overlap, fs, side='onesided'):
     """
+    TODO: docstring
     
     If data x[0], x[1], ..., x[N - 1] of N samples is divided into P segments of D
     samples each, with a shift os S samples between adjacents segments (S<=D),
@@ -31,7 +32,21 @@ def pwelch(data, D, overlap, fs, side='onesided'):
     U = T * np.sum(w[n]**2)
     
     """
+    if not isinstance(data,np.ndaaray):
+        raise Exception("data must be a array_like")
+        
+    if not isinstance(D,int) or not isinstance(D,float):
+        raise Exception("D must be a integer or a float")
+        
+    if not isinstance(fs,int) or not isinstance(fs,float):
+        raise Exception("overlap must be a integer or a float")  
+        
+    if not isinstance(fs,int) or not isinstance(fs,float):        
+        raise Exception("fs must be a integer or a float")
 
+    if not isinstance(side,str):
+        raise Exception("fs must be a string. 'one-sided' or 'twosided'")
+        
     start = 0
     end = D
 
@@ -49,7 +64,7 @@ def pwelch(data, D, overlap, fs, side='onesided'):
     data_dc2_han = []
     PSD = []
 
-    for i in xrange(P):
+    for p in xrange(P):
         data_temp = data[start:end]
         data_dc_han = (data_temp - np.mean(data_temp)) * np.hanning(D)
         data_dc2_han = data_dc_han - np.mean(data_dc_han)
