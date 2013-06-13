@@ -35,14 +35,14 @@ def pwelch(data, D, overlap, fs, side='onesided'):
     if not isinstance(data,np.ndaaray):
         raise Exception("data must be a array_like")
         
-    if not isinstance(D,int) or not isinstance(D,float):
-        raise Exception("D must be a integer or a float")
+    if not isinstance(D,int):
+        raise Exception("D must be a integer")
         
-    if not isinstance(fs,int) or not isinstance(fs,float):
-        raise Exception("overlap must be a integer or a float")  
+    if not isinstance(overlap,int):
+        raise Exception("overlap must be a integer")  
         
-    if not isinstance(fs,int) or not isinstance(fs,float):        
-        raise Exception("fs must be a integer or a float")
+    if not isinstance(fs,int):        
+        raise Exception("fs must be a integer")
 
     if not isinstance(side,str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
