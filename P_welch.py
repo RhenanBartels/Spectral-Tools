@@ -32,19 +32,15 @@ def pwelch(data, D, overlap, fs, side='onesided'):
     U = T * np.sum(w[n]**2)
     
     """
-    if not isinstance(data,np.ndaaray):
-        raise Exception("data must be a array_like")
-        
-    if not isinstance(D,int):
-        raise Exception("D must be a integer")
-        
-    if not isinstance(overlap,int):
-        raise Exception("overlap must be a integer")  
-        
-    if not isinstance(fs,int):        
+    if not isinstance(data, np.ndarray):
+        raise Exception("data must be a array_like")        
+    elif D != int(D):
+        raise Exception("D must be a integer")        
+    elif overlap != int(overlap):
+        raise Exception("overlap must be a integer")          
+    elif fs != int(fs):        
         raise Exception("fs must be a integer")
-
-    if not isinstance(side,str):
+    elif not isinstance(side, str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
         
     start = 0
