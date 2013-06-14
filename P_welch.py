@@ -15,34 +15,58 @@ import numpy as np
 
 def pwelch(data, D, overlap, fs, side='onesided'):
     """
-    TODO: docstring
-    
-    If data x[0], x[1], ..., x[N - 1] of N samples is divided into P segments of D
-    samples each, with a shift os S samples between adjacents segments (S<=D),
-    then the maximum number of segments P is given by the integer part of:
-    P = (N - D) / S + 1. The  periodogram estivative is defined by:
-    
+    Parameters
+    ----------
+    data: array_like, 1-D
+        Signal.
+    D: interger
+        Segment size.
+    overlap: interger
+        overlap of adjancent segments.
+   fs: integer
+       sampling frequency
+   side: str or None, optional
+       Must be 'onesided' or 'twosided'. This determinates the length of the
+       outputs. If 'onesided' then 'f' and 'Pxx' goes from 0 to fs / 2 + 1,
+       else, 'f' and 'Pxx' goes from 0 to fs -1.
+
+   Returns
+   ------
+   f: array_like, 1-D
+       frequency content.
+   Pxx: array_like, 1_D
+       Auto Power Spectrum of 'data'
+
+   ---------------------------------------------------------------------------
+
+    If data x[0], x[1], ..., x[N - 1] of N samples is divided into P segments
+    of D samples each, with a shift os S samples between adjacents segments
+    (S<=D), then the maximum number of segments P is given by the integer part
+    of: P = (N - D) / S + 1. The  periodogram estivative is defined by:
+
                   Pxx(p) = (1 / (U * D * T)) * abs(X(f))**2
-                  
-    Where p is the range of segments O <= p <= P - 1 over the frequency  
-    -1/2*T <= f <= 1/2*T, where X(f) is the DFT of the pth segment. 
+
+    Where p is the range of segments O <= p <= P - 1 over the frequency
+    -1/2*T <= f <= 1/2*T, where X(f) is the DFT of the pth segment.
     U is the discrete-time window energy and T is the sample interval.
     X(f) =  T * x[n] * np.exp(-1j * 2 * np.pi * f * n * T)
     T = 1 / fs
     U = T * np.sum(w[n]**2)
-    
+
     """
     if not isinstance(data, np.ndarray):
-        raise Exception("data must be a array_like")        
+        raise Exception("data must be a array_like")
     elif D != int(D):
-        raise Exception("D must be a integer")        
+        raise Exception("D must be a integer")
     elif overlap != int(overlap):
-        raise Exception("overlap must be a integer")          
-    elif fs != int(fs):        
+        raise Exception("overlap must be a integer")
+    elif fs != int(fs):
         raise Exception("fs must be a integer")
     elif not isinstance(side, str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
-        
+    if len(data) < D:
+        raise Exception("D must be smaller than the length of data")
+
     start = 0
     end = D
 
