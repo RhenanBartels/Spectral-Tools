@@ -57,16 +57,16 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     """
     if not isinstance(data, np.ndarray):
         raise Exception("data must be a array_like")
-    elif D != int(D):
-        raise Exception("D must be a integer")
-    elif overlap != int(overlap):
-        raise Exception("overlap must be a integer")
-    elif fs != int(fs):
-        raise Exception("fs must be a integer")
+    elif D != int(D) or D <= 0:
+        raise Exception("D must be an integer greater than zero")
+    elif overlap != int(overlap) or overlap < 0:
+        raise Exception("overlap must be an interger greater than zero")
+    elif fs != int(fs) or fs <= 0:
+        raise Exception("fs must be an integer greater than zero")
     elif not isinstance(side, str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
-    elif nfft is not None and nfft != int(nfft):
-        raise ValueError("nfft must be None or an integer")
+    elif nfft is not None and nfft != int(nfft) or nfft <= 0:
+        raise ValueError("nfft must be None or an integer greater than zero")
     elif nfft is not None and nfft <= D:
         raise Exception("nfft must be greater than D")
     elif overlap >= D:
