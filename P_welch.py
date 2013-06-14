@@ -13,7 +13,7 @@
 import numpy as np
 
 
-def pwelch(data, D, overlap, fs, side='onesided'):
+def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     """
     Parameters
     ----------
@@ -25,6 +25,8 @@ def pwelch(data, D, overlap, fs, side='onesided'):
         overlap of adjancent segments.
    fs: integer
        sampling frequency
+   nfft: integer
+       Size of Zero-Padding
    side: str or None, optional
        Must be 'onesided' or 'twosided'. This determinates the length of the
        outputs. If 'onesided' then 'f' and 'Pxx' goes from 0 to fs / 2 + 1,
@@ -35,8 +37,7 @@ def pwelch(data, D, overlap, fs, side='onesided'):
    f: array_like, 1-D
        frequency content.
    Pxx: array_like, 1_D
-       Auto Power Spectrum of 'data'
-
+       Power Spectral Density
    ---------------------------------------------------------------------------
 
     If data x[0], x[1], ..., x[N - 1] of N samples is divided into P segments
@@ -64,8 +65,15 @@ def pwelch(data, D, overlap, fs, side='onesided'):
         raise Exception("fs must be a integer")
     elif not isinstance(side, str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
+    elif nfft is not None and nfft != int(nfft):
+        raise ValueError("nfft must be None or an integer")
+    elif nfft is not None and nfft <= D:
+        raise Exception("nfft must be greater than D")
+    elif overlap >= D:
+        raise Exception("overlap must be smaller than D")
     if len(data) < D:
         raise Exception("D must be smaller than the length of data")
+
 
     start = 0
     end = D
@@ -84,12 +92,19 @@ def pwelch(data, D, overlap, fs, side='onesided'):
     data_dc2_han = []
     PSD = []
 
+    if nfft is not None:
+        zplen = nfft - D
+        zp = np.zeros(zplen)
+    else:
+        zp = []
+
     for p in xrange(P):
-        data_temp = data[start:end]
-        data_dc_han = (data_temp - np.mean(data_temp)) * np.hanning(D)
+        data_temp = np.concatenate((data[start:end], zp), axis=0)
+        data_dc_han = (data_temp - np.mean(data_temp)) *\
+                       np.hanning(len(data_temp))
         data_dc2_han = data_dc_han - np.mean(data_dc_han)
         #Xf = abs(np.fft.fft(data_dc2_han/fs))**2 #Digital Spectral Analysis Marple
-        Xf = (abs(np.fft.fft(data_dc2_han)) / D)**2  # Proakis Monolakis Pag 911
+        Xf = (abs(np.fft.fft(data_dc2_han)) / len(data_temp))**2  # Proakis Monolakis Pag 911
         PSD.append(Xf / U)  # Digital Spectral Analysis Marple
         #PSD.append(Xf/(D*U)) # Proakis Monolakis Pag 911
         #PSD.append(Xf/(D*U)) # Notes on Digital Signal Processing: Note 31
