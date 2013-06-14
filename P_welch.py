@@ -95,6 +95,7 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     if nfft is not None:
         zplen = nfft - D
         zp = np.zeros(zplen)
+        U = (1.0 / nfft) * sum(np.hanning(nfft)**2)
     else:
         zp = []
 
