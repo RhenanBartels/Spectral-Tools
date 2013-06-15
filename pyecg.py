@@ -3,9 +3,12 @@
 from scipy.signal import butter, filtfilt
 from easygui import multenterbox
 import matplotlib.pyplot as plt
-from numpy import diff, array, cumsum, where
+from numpy import diff, array, cumsum, where, arange, delete
 
 def ecg2rri(x):
+    global rri, t, ax2
+    plt.switch_backend('qt4Agg')
+    plt.ion()
     msg = "RRi Detection Parameters"
     title = "Parameters Dialog"
     fieldNames = ["Threshold", "Refractory Period", "Low Cuttof Freq.",
@@ -24,34 +27,32 @@ def ecg2rri(x):
         xd[peaks + 1] < 0 and xf[peaks] > thr or xd[peaks] == 0])  #find RR peaks above threshold.
 
     rri = diff(peaks)  # RRi in miliseconds
-    t = cumsum(rri)
-    return t, rri, peaks
-
-def findMin(x, y):
-    val = []
-    pos = []
-    val = [min(abs(tt - x)) for tt in y]
-    pos = [where(y == comp)[0][0] for comp in val]
-    return val, pos
-
-
-    return val, pos
-
-def renderPlot(ax1, ax2, x1, x2):
-    ax1.plot(x1)
-    ax2.plot(x2)
-
-def onclick(event):
-    global rr_ind
-    rr_ind.append(event.x)
-
-def manualEdit(t_ecg, ecg, t_rri, rri):
+    t = cumsum(rri) / 1000.0
+    t_ecg = arange(0, len(xf)) / Fs
     fig = plt.figure()
     ax1 = fig.add_subplot(2, 1, 1)
-    ax2 = fig.add_subplot(2,1, 2)
-    ax1.plot(t_ecg, ecg)
-    ax2.plot(t_rri, rri)
-    rr_ind = []
-    ev = fig.canvas.mpl_connect('button_press_event', onclick)
-    vp, mp = findMin(t_rri, t_ecg[rr_ind])
+    ax2 = fig.add_subplot(2, 1, 2)
+    ax1.plot(t_ecg, xf)
+    ax1.plot(t_ecg[peaks], xf[peaks], 'g.-')
+    ax2.plot(t, rri, 'k.-')
+    fig.canvas.mpl_connect('button_press_event', onclick)
+    return t, rri, peaks
 
+
+def findMin(x, v):
+    val = abs(v - x)
+    pos = where(val == min(val))[0][0]
+    print 'Position = %d, Value = %f' %(pos, v[pos])
+
+    return val, pos
+
+
+def onclick(event):
+    global rri, t, ax2
+    xx = event.xdata
+    val, pos = findMin(xx, t)
+    rri = delete(rri, pos)
+    t = cumsum(rri) / 1000.0
+    plt.hold('off')
+    ax2.plot(t, rri, 'k.-')
+    print rri
