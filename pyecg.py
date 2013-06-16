@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 from numpy import diff, array, cumsum, where, arange, delete
 
 def ecg2rri(x):
-    global rri, t, ax2
+    global rri, t, ax2, pos_c
+    pos_c = []
     plt.switch_backend('qt4Agg')
     plt.ion()
     msg = "RRi Detection Parameters"
@@ -48,11 +49,12 @@ def findMin(x, v):
 
 
 def onclick(event):
-    global rri, t, ax2
+    global rri, t, ax2, poc_c
     xx = event.xdata
     val, pos = findMin(xx, t)
-    rri = delete(rri, pos)
+    pos_c.append(pos)
+    if pos not in pos_c:
+        rri = delete(rri, pos)
+        print pos_c
     t = cumsum(rri) / 1000.0
-    plt.hold('off')
     ax2.plot(t, rri, 'k.-')
-    print rri
