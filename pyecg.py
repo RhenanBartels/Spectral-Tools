@@ -37,7 +37,7 @@ def ecg2rri(x):
     ax1.plot(t_ecg[peaks], xf[peaks], 'g.-')
     ax2.plot(t, rri, 'k.-')
     fig.canvas.mpl_connect('button_press_event', onclick)
-    return t, rri, peaks
+    return t, rri
 
 
 def findMin(x, v):
