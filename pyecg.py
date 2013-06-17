@@ -55,6 +55,5 @@ def onclick(event):
     pos_c.append(pos)
     if pos not in pos_c:
         rri = delete(rri, pos)
-        print pos_c
     t = cumsum(rri) / 1000.0
     ax2.plot(t, rri, 'k.-')
