@@ -25,36 +25,33 @@ class Base:
         self.data = loadtxt(Path)
 
 
-    def var(self, widget):
-        self.D = int(self.textbox1.get_text().strip())
-        self.O = int(self.textbox2.get_text().strip())
-        self.FS = int(self.textbox3.get_text().strip())
-
-
     def stft(self, widget):
+        D = int(self.textbox1.get_text().strip())
+        O = int(self.textbox2.get_text().strip())
+        FS = int(self.textbox3.get_text().strip())
         t = cumsum(self.data) / 1000.0
-        tx = arange(t[0], t[-1], 1.0 / self.FS)
+        tx = arange(t[0], t[-1], 1.0 / FS)
         data = interp(tx, t, self.data)
         start = 0
-        stop = self.D
+        stop = D
         win = hanning
-        S = self.D - self.O
-        U = (1.0 / self.D) * sum(win(self.D))**2
-        P = int(len(data) - self.D) / S + 1
+        S = D - O
+        U = (1.0 / D) * sum(win(D))**2
+        P = int(len(data) - D) / S + 1
         Sxx = []
         Time = []
         for k in xrange(P):
             data_temp = data[start:stop]
-            data_dc = (data_temp - mean(data_temp)) * win(self.D)
+            data_dc = (data_temp - mean(data_temp)) * win(D)
             data_dc2 = data_dc - mean(data_dc)
             Xf = abs(fft.fft(data_dc2 / U))**2
             Sxx.append(Xf)
             Time.append(start)
             start += S
             stop += S
-        Sxx = array(Sxx)[:, 0: self.FS / 2.0 + 1]
-        print Sxx.shape, P
-        F = linspace(0, self.FS / 2.0, self.D / 2.0 + 1)
+        Sxx = array(Sxx)[:, 0: FS / 2.0 + 1]
+        print range(0, int(FS / 2.0) + 1)
+        F = linspace(0, FS / 2.0, D / 2.0 + 1)
         Time = array(Time)
         #Time = linspace(0, start, Sxx.shape[0])
         plt.plot(tx, data)
@@ -62,7 +59,7 @@ class Base:
     def __init__(self):
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.set_size_request(600, 400)
+        self.window.set_size_request(200, 200)
         self.button1 = gtk.Button("Load")
         self.button2 = gtk.Button("STFT")
         self.button1.connect("clicked", self.load)
@@ -73,15 +70,12 @@ class Base:
         self.textbox1.set_text("512")
         self.textbox2.set_text("256")
         self.textbox3.set_text("4")
-        self.textbox1.connect("changed", self.var)
-        self.textbox2.connect("changed", self.var)
-        self.textbox3.connect("changed", self.var)
         fixed = gtk.Fixed()
-        fixed.put(self.button1, 20, 30)
-        fixed.put(self.button2, 80, 30)
-        fixed.put(self.textbox1, 40, 60)
-        fixed.put(self.textbox2, 40, 90)
-        fixed.put(self.textbox3, 40, 120)
+        fixed.put(self.button1, 15, 30)
+        fixed.put(self.button2, 75, 30)
+        fixed.put(self.textbox1, 15, 60)
+        fixed.put(self.textbox2, 15, 90)
+        fixed.put(self.textbox3, 15, 120)
         self.window.add(fixed)
         self.window.show_all()
         self.window.connect("destroy", self.destroy)
