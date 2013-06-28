@@ -65,9 +65,9 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
         raise Exception("fs must be an integer greater than zero")
     elif not isinstance(side, str):
         raise Exception("fs must be a string. 'one-sided' or 'twosided'")
-    elif nfft is not None and nfft != int(nfft) or nfft <= 0:
+    elif nfft is not None and (nfft != int(nfft) or nfft <= 0):
         raise ValueError("nfft must be None or an integer greater than zero")
-    elif nfft is not None and nfft <= D:
+    elif nfft is not None and (nfft <= D):
         raise Exception("nfft must be greater than D")
     elif overlap >= D:
         raise Exception("overlap must be smaller than D")
