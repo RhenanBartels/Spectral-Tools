@@ -34,7 +34,7 @@ if __name__ == '__main__':
     try:
         sys.argv[1]
     except IndexError:
-        print "You must add a file. $ python p2rri.py filename.txt"
+        print "You must add a file. $python p2rri.py filename.txt"
         sys.exit()
 
     if 'txt' not in sys.argv[1]:
