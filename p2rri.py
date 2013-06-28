@@ -23,7 +23,7 @@ def detpolar(x_is, thr, freqs):
     ct2 = x_is[1:len(x_is)]
     ctrl = ct2 - ct1
     pos = where(ctrl == 1)[0] + 1
-    rri = diff(pos) / freqs
+    rri = diff(pos) / float(freqs)
     t_is = cumsum(rri)
     return t_is, rri
 
@@ -35,6 +35,7 @@ if __name__ == '__main__':
         sys.argv[1]
     except IndexError:
         print "You must add a file. $ python p2rri.py filename.txt"
+        sys.exit()
 
     if 'txt' not in sys.argv[1]:
         raise Exception("File must be a text file")
@@ -49,6 +50,11 @@ if __name__ == '__main__':
                 continue
 
     TIME, RR, = detpolar(array(DT), 1, 1000)
+
+    with open("RRi_" + sys.argv[1], 'w') as f:
+        for ln in RR:
+            f.write(str(ln) + "\n")
+
     plt.plot(TIME, RR)
     plt.title("Tachogram")
     plt.xlabel("TIME (s)")
