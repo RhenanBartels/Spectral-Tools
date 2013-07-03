@@ -20,7 +20,7 @@ def detpolar(x_is, thr, freqs):
     x_is[x_is >= thr] = 1
     x_is[x_is < thr] = 0
     ct1 = x_is[0:-1]
-    ct2 = x_is[1:len(x_is)]
+    ct2 = x_is[1::]
     ctrl = ct2 - ct1
     pos = where(ctrl == 1)[0] + 1
     rri = diff(pos) / float(freqs)
