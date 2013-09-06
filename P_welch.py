@@ -43,7 +43,7 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     If data x[0], x[1], ..., x[N - 1] of N samples is divided into P segments
     of D samples each, with a shift os S samples between adjacents segments
     (S<=D), then the maximum number of segments P is given by the integer part
-    of: P = (N - D) / S + 1. The  periodogram estivative is defined by:
+    of: P = (N - D) / S + 1. The  periodogram estivative is defined by;
 
                   Pxx(p) = (1 / (U * D * T)) * abs(X(f))**2
 
@@ -74,24 +74,17 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     if len(data) < D:
         raise Exception("D must be smaller than the length of data")
 
-
     start = 0
     end = D
 
-    T = 1.0 / fs  # T is sample interval
-    trun_size = len(data)/D
-    data = data[0:trun_size*D]
+    psd_len = D / 2.0 + 1
 
     S = D - overlap
     P = int((len(data) - D) / S) + 1
-    U = (1.0 / D) * sum(np.hanning(D)**2)  # Proakis Monolakis Pag 911
-    #U = T * sum(np.hanning(D)**2)  #Digital Spectral Analysis Marple
+    H = np.hanning(D)
+    U = np.dot(H.T, H) / D
 
-    data_temp = []
-    data_dc_han = []
-    data_dc2_han = []
-    PSD = []
-
+    Sxx = 0
     if nfft is not None:
         zplen = nfft - D
         zp = np.zeros(zplen)
@@ -99,25 +92,25 @@ def pwelch(data, D, overlap, fs, nfft=None, side='onesided'):
     else:
         zp = []
 
+    scale = int(P) * D * fs * U
+
     for p in xrange(P):
         data_temp = np.concatenate((data[start:end], zp), axis=0)
         data_dc_han = (data_temp - np.mean(data_temp)) *\
                        np.hanning(len(data_temp))
         data_dc2_han = data_dc_han - np.mean(data_dc_han)
-        #Xf = abs(np.fft.fft(data_dc2_han/fs))**2 #Digital Spectral Analysis Marple
-        Xf = (abs(np.fft.fft(data_dc2_han)) / len(data_temp))**2  # Proakis Monolakis Pag 911
-        PSD.append(Xf / U)  # Digital Spectral Analysis Marple
-        #PSD.append(Xf/(D*U)) # Proakis Monolakis Pag 911
-        #PSD.append(Xf/(D*U)) # Notes on Digital Signal Processing: Note 31
+        xf = np.fft.fft(data_dc_han)
+        Sxx = Sxx + np.real(xf * np.conj(xf))
         start += S
         end += S
 
     if side == 'onesided':
-        Pxx = 2 * np.sum(PSD, axis=0) / P
-        Pxx = Pxx[0:D / 2.0 + 1]
-        f = np.linspace(0, fs / 2, D / 2.0 + 1)
+        Pxx = 2 * (Sxx / scale)
+        Pxx = Pxx[0:psd_len]
+        f = np.linspace(0, fs / 2, psd_len)
     else:
-        Pxx = np.sum(PSD, axis=0) / P
+        Pxx = np.sum(PSD, axis=0) / (P * U)
         f = np.linspace(0, fs, len(Pxx))
 
     return f, Pxx
+#TODO: PEP8, Pylint
